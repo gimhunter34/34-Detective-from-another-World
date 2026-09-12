@@ -1464,7 +1464,7 @@ class _AnswerScreenState extends State<AnswerScreen> {
         return AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           content: const Text(
-            '헌페스 경력 34년차 탐정인 당신.\n어느 날 김기려 헌터가 누군가와 열애 중이라는 사실을 직감했고, 우연한 기회로 그의 폰을 입수했다.\n잠시 뒤에 그가 찾으러 온다고 했지만...\n그전에 김 헌터의 연인을 찾아보자.',
+            '헌페스 경력 34년차 탐정인 당신.\n어느 날 김기려 헌터가 누군가와 열애 중이라는 사실을 직감했고, 우연히 그의 폰을 입수했다.\n잠시 뒤에 그가 찾으러 온다고 했지만...\n그전에 김 헌터의 연인을 찾아보자.',
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 14, height: 1.5),
           ),
