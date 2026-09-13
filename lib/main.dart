@@ -697,6 +697,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
               '010-XXXX-XXXX',
               Colors.deepPurple,
               true,
+              true,
             ),
           ] else ...[
             _buildGroupTitle('ㄱ'),
@@ -706,6 +707,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
               '010-XXXX-XXXX',
               Colors.deepPurple,
               true,
+              false,
             ),
 
             _buildGroupTitle('ㅅ'),
@@ -715,12 +717,14 @@ class _ContactsScreenState extends State<ContactsScreen> {
               '010-XXXX-XXXX',
               Colors.pink,
               false,
+              false,
             ),
             _buildContactCard(
               context,
               '선우연',
               '010-XXXX-XXXX',
               Colors.lightBlue,
+              false,
               false,
             ),
 
@@ -731,6 +735,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
               '010-XXXX-XXXX',
               Colors.blueGrey,
               false,
+              false,
             ),
 
             _buildGroupTitle('ㅈ'),
@@ -739,6 +744,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
               '정하성',
               '010-XXXX-XXXX',
               Colors.redAccent,
+              false,
               false,
             ),
           ],
@@ -786,9 +792,21 @@ class _ContactsScreenState extends State<ContactsScreen> {
       String phone,
       Color color,
       bool isKang,
+      bool isHiddenEnding,
       ) {
     return GestureDetector(
-      onTap: isKang ? () => Navigator.pushNamed(context, '/call') : null,
+      onTap: isKang
+          ? () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => IncomingCallScreen(
+              isHiddenEnding: isHiddenEnding,
+            ),
+          ),
+        );
+      }
+          : null,
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
         padding: const EdgeInsets.all(15),
@@ -848,7 +866,12 @@ class _ContactsScreenState extends State<ContactsScreen> {
 // 5. 전화 수신 화면 (Incoming Call Screen)
 // ==========================================
 class IncomingCallScreen extends StatelessWidget {
-  const IncomingCallScreen({Key? key}) : super(key: key);
+  final bool isHiddenEnding;
+
+  const IncomingCallScreen({
+    Key? key,
+    this.isHiddenEnding = false,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -877,10 +900,13 @@ class IncomingCallScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(15),
                 border: Border.all(color: Colors.blueAccent),
               ),
-              child: const Text(
-                '강창호에게 전화가 걸려왔다.\n받을 때까지 계속 하려는 것 같다...',
+              child:
+              Text(
+                isHiddenEnding
+                    ? '강창호에게 전화가 걸려왔다.\n비밀리에 특별한 애칭으로 저장되었다니...\n이번에는 받아보는 게 좋을 것 같다.'
+                    : '강창호에게 전화가 걸려왔다.\n받을 때까지 계속 하려는 것 같다...',
                 textAlign: TextAlign.center,
-                style: TextStyle(height: 1.5),
+                style: const TextStyle(height: 1.5),
               ),
             ),
             const SizedBox(height: 40),
@@ -890,7 +916,30 @@ class IncomingCallScreen extends StatelessWidget {
                 _buildCallButton(context, Colors.red, Icons.call_end, '거절', () {
                   Navigator.pop(context);
                 }),
-                _buildCallButton(context, Colors.green, Icons.call, '수락', () {}),
+                _buildCallButton(
+                  context,
+                  Colors.green,
+                  Icons.call,
+                  '수락',
+                      () {
+                    if (isHiddenEnding) {
+                      // 히든엔딩 조건을 만족한 경우에만 히든엔딩으로 이동
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const EndingScreen(
+                            detectiveName: '당신',
+                            evidenceCount: '히든엔딩',
+                            isHiddenEnding: true,
+                          ),
+                        ),
+                      );
+                    } else {
+                      // 일반적인 경우
+                      // 기존에는 아무 동작도 하지 않았으므로 그대로 유지
+                    }
+                  },
+                ),
               ],
             ),
             const SizedBox(height: 50),
@@ -1918,8 +1967,9 @@ class _GalleryDetailScreenState extends State<GalleryDetailScreen> {
 class EndingScreen extends StatefulWidget {
   final String detectiveName;
   final String evidenceCount;
+  final bool isHiddenEnding;
 
-  const EndingScreen({Key? key, required this.detectiveName, required this.evidenceCount}) : super(key: key);
+  const EndingScreen({Key? key, required this.detectiveName, required this.evidenceCount, this.isHiddenEnding = false,}) : super(key: key);
 
   @override
   State<EndingScreen> createState() => _EndingScreenState();
@@ -1962,6 +2012,26 @@ class _EndingScreenState extends State<EndingScreen> {
 
   // 💡 불필요하게 반복되던 딜레이 코드를 간결하게 정리
   List<String> _getEndingStory() {
+    if (widget.isHiddenEnding) {
+      return [
+        '전화가 연결된다.',
+        '- 드디어 받는,',
+        '"여보세요? 이 휴대폰 주인의 애인 맞으세요?"',
+        '수화기 너머가 잠시 조용해진다.',
+        '- ... 내가?',
+        '"네. 연락처에 애인이라고 저장되어 있으시던데요."',
+        '- .......',
+        '남자는 침묵하다가, 이내 기분을 알 수 없는 목소리로 말한다.',
+        '- 이봐, 탐정님. 오늘은 이만 그 휴대폰은 내려놓고 떠나는 게 좋겠어.',
+        '"네?"',
+        '- 아, 그리고 이건,',
+        '"고마움의 표시야."',
+        '등뒤에서 목소리가 들린다. 뒤를 돌아보기도 전에 눈앞에 별이 튄다.',
+        '정신이 들자 이미 며칠이 지난 뒤였다. 길을 가다 게이트에 빠진 당신을 강창호 헌터가 구해주었다고 한다.',
+        '아무것도 기억나지 않아 그 말을 믿기 어렵지만... 병원에 맡겨질 때 같이 전달된 수표 여러 장과 얼얼한 뒤통수만이 당신의 곁을 지킬 뿐이다.',
+      ];
+    }
+
     switch (widget.evidenceCount) {
       case '0개':
         return [
@@ -2034,6 +2104,10 @@ class _EndingScreenState extends State<EndingScreen> {
   }
 
   String _getEndingMessage() {
+    if (widget.isHiddenEnding) {
+      return '사랑의 큐피드';
+    }
+
     switch (widget.evidenceCount) {
       case '0개':
         return '똥촉의 결말';
